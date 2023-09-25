@@ -47,18 +47,22 @@ async fn main() {
         println!("Client error: {:?}", why);
     }
 }
-// テストでムンシャにしてる
 async fn get_btc_price() -> String {
     let query = r#"
         {
-            items(name: "MoonShine") {
+            items(name: "Physical bitcoin") {
                 id
                 name
-                avg24hPrice
+                traderPrices {
+                    trader {
+                        name
+                    }
+                    price
+                    currency
+                }
             }
         }
     "#;
-
     let client = reqwest::Client::new();
     let body = serde_json::json!({
         "query": query
@@ -72,7 +76,17 @@ async fn get_btc_price() -> String {
             Ok(response) => {
                 if let Ok(json) = response.json::<Value>().await {
                     println!("{:?}", json);
-                    json["data"]["items"][0]["avg24hPrice"].to_string()
+                    let item = &json["data"]["items"][0];
+                    let trader_prices = &item["traderPrices"];
+                    let prices: Vec<String> = trader_prices.as_array().unwrap_or(&vec![]).iter().map(|tp| {
+                        format!(
+                            "Trader: {}, Price: {} {}",
+                            tp["trader"]["name"].as_str().unwrap_or("Unknown"),
+                            tp["price"].as_u64().unwrap_or(0),
+                            tp["currency"].as_str().unwrap_or("₽")
+                        )
+                    }).collect();
+                    prices.join(", ")
                 } else {
                     "Failed to parse response".to_string()
                 }
