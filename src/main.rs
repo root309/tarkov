@@ -1,59 +1,57 @@
+extern crate serenity;
 extern crate reqwest;
 extern crate serde_json;
-extern crate twilight_gateway;
-extern crate twilight_http;
-extern crate twilight_model;
 
+use serenity::{
+    async_trait,
+    framework::standard::StandardFramework,
+    model::{channel::Message, gateway::{Ready, GatewayIntents}},
+    prelude::*,
+};
+use serde_json::Value;
 use dotenv::dotenv;
 use std::env;
-use twilight_gateway::{cluster::{ShardScheme, Cluster}, Intents};
-use twilight_http::Client as HttpClient;
-use futures::stream::StreamExt;
-use serde_json::Value;
+// イベントハンドラの構造体
+struct Handler;
+
+#[async_trait]
+impl EventHandler for Handler {
+    // 新しいメッセージを受信したときのイベントハンドラ
+    async fn message(&self, ctx: Context, msg: Message) {
+        // コマンドが受信された場合にビットコインの価格を取得して出力
+        if msg.content == "!btc" {
+            let price = get_btc_price().await;
+            if let Err(why) = msg.channel_id.say(&ctx.http, format!("Current BTC Price: {}", price)).await {
+                println!("Error sending message: {:?}", why);
+            }
+        }
+    }
+    // ボット接続イベント
+    async fn ready(&self, _: Context, ready: Ready) {
+        println!("{} is connected!", ready.user.name);
+    }
+}
 
 #[tokio::main]
 async fn main() {
-    dotenv().ok(); // .envファイルから環境変数を読み込む
+    // .envファイルから環境変数を読み込む
+    dotenv().ok();
 
-    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment"); // 環境変数からトークンを取得
+    // DISCORD_TOKEN環境変数からトークンを取得する
+    let token = env::var("DISCORD_TOKEN")
+        .expect("Expected a token in the environment");
 
-    let http = HttpClient::new(token.clone()); // HTTPクライアントを初期化
-
-    // クラスタを作成してShardSchemeを自動に設定
-    let cluster = Cluster::builder(token, Intents::GUILD_MESSAGES)
-        .shard_scheme(ShardScheme::Auto)
-        .build()
+    // クライアントを作成
+    let mut client = Client::builder(&token, GatewayIntents::all())
+        .event_handler(Handler)
+        .framework(StandardFramework::new())
         .await
-        .expect("Cluster create failed");
+        .expect("Err creating client");
 
-    let mut events = cluster.events(); // イベントストリームを取得
-
-    // 別の非同期タスクとしてクラスタを起動
-    let cluster_spawn_handle = tokio::spawn(async move {
-        cluster.up().await;
-    });
-
-    println!("Bot is now running."); // Bot起動
-
-    // イベントストリームからイベントを受け取り続ける
-    while let Some(( _ , event)) = events.next().await {
-        match event {
-            twilight_gateway::Event::MessageCreate(msg) => { // メッセージ作成イベントを処理
-                if msg.content == "!btc" { // コマンドをチェック
-                    let price = get_btc_price().await; // BTC価格を取得
-                    let _ = http
-                        .create_message(msg.channel_id) // メッセージを作成
-                        .content(format!("Current BTC Price: {}", price)) // 価格情報を含むメッセージを設定
-                        .expect("Message content error")
-                        .await
-                        .expect("HTTP request failed");
-                }
-            }
-            _ => {},
-        }
+    // クライアントを開始し、エラーが発生した場合はエラーを出力する
+    if let Err(why) = client.start().await {
+        println!("Client error: {:?}", why);
     }
-
-    cluster_spawn_handle.await.expect("Cluster task failed"); // クラスタタスクの完了を待つ
 }
 
 // ビットコインの価格を取得する非同期関数
@@ -73,20 +71,20 @@ async fn get_btc_price() -> String {
             }
         }
     "#;
-    let client = reqwest::Client::new(); // HTTPクライアントを初期化
+    let client = reqwest::Client::new();
     let body = serde_json::json!({
-        "query": query // GraphQLクエリを設定
+        "query": query
     });
 
     // GraphQLエンドポイントにPOSTリクエストを送信し、レスポンスを解析する
     match client.post("https://api.tarkov.dev/graphql")
-        .header("Content-Type", "application/json") // ヘッダーを設定
-        .body(serde_json::to_string(&body).unwrap())  // bodyをJSONとして送信する
+        .header("Content-Type", "application/json")
+        .json(&body)  // bodyをJSONとして送信する
         .send()
         .await {
             Ok(response) => {
                 if let Ok(json) = response.json::<Value>().await {
-                    //println!("{:?}", json); // レスポンスを表示
+                    //println!("{:?}", json); // レスポンス表示
                     // アイテムとトレーダーの価格情報を解析し、整形する
                     let item = &json["data"]["items"][0];
                     let trader_prices = &item["traderPrices"];
@@ -100,9 +98,9 @@ async fn get_btc_price() -> String {
                     }).collect();
                     prices.join(", ")
                 } else {
-                    "Failed to parse response".to_string() // レスポンスの解析に失敗した場合のエラーメッセージ
+                    "Failed to parse response".to_string()
                 }
             },
-            Err(_) => "Failed to send request".to_string(), // リクエストの送信に失敗した場合のエラーメッセージ
+            Err(_) => "Failed to send request".to_string(),
     }
 }
