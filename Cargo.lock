@@ -3,7 +3,7 @@
 version = 3
 
 [[package]]
-name = "Tarkov-DisbotRust"
+name = "Tarkov-MarketObserver"
 version = "0.1.0"
 dependencies = [
  "dotenv",
