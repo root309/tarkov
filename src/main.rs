@@ -47,7 +47,7 @@ async fn main() {
         println!("Client error: {:?}", why);
     }
 }
-
+// テストでムンシャにしてる
 async fn get_btc_price() -> String {
     let query = r#"
         {
@@ -60,13 +60,18 @@ async fn get_btc_price() -> String {
     "#;
 
     let client = reqwest::Client::new();
+    let body = serde_json::json!({
+        "query": query
+    });
+
     match client.post("https://api.tarkov.dev/graphql")
         .header("Content-Type", "application/json")
-        .body(format!(r#"{{"query": "{}"}}"#, query))
+        .json(&body)  // bodyをJSONとして送信する
         .send()
         .await {
             Ok(response) => {
                 if let Ok(json) = response.json::<Value>().await {
+                    println!("{:?}", json);
                     json["data"]["items"][0]["avg24hPrice"].to_string()
                 } else {
                     "Failed to parse response".to_string()
