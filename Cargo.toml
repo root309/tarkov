@@ -6,6 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serenity = { version = "0.10", default-features = false, features = ["client", "gateway", "http", "model", "rustls_backend", "framework"] }
+serenity = { version = "0.10", features = ["client", "framework", "rustls_backend", "standard_framework"] }
 tokio = { version = "1", features = ["full"] }
 dotenv = "0.15"
