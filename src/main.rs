@@ -5,7 +5,7 @@ extern crate serde_json;
 use serenity::{
     async_trait,
     framework::standard::StandardFramework,
-    model::{channel::Message, gateway::Ready},
+    model::{channel::Message, gateway::{Ready, GatewayIntents}},
     prelude::*,
 };
 use serde_json::Value;
@@ -42,7 +42,7 @@ async fn main() {
         .expect("Expected a token in the environment");
 
     // クライアントを作成
-    let mut client = Client::builder(&token)
+    let mut client = Client::builder(&token, GatewayIntents::all())
         .event_handler(Handler)
         .framework(StandardFramework::new())
         .await
@@ -53,6 +53,7 @@ async fn main() {
         println!("Client error: {:?}", why);
     }
 }
+
 // ビットコインの価格を取得する非同期関数
 async fn get_btc_price() -> String {
     let query = r#"
