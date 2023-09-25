@@ -2,6 +2,7 @@ extern crate serenity;
 
 use serenity::{
     async_trait,
+    framework::standard::StandardFramework,
     model::{channel::Message, gateway::Ready},
     prelude::*,
 };
