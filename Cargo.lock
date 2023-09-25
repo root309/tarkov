@@ -3,18 +3,6 @@
 version = 3
 
 [[package]]
-name = "Tarkov-MarketObserver"
-version = "0.1.0"
-dependencies = [
- "dotenv",
- "reqwest",
- "serde",
- "serde_json",
- "serenity",
- "tokio",
-]
-
-[[package]]
 name = "addr2line"
 version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1277,6 +1265,18 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
+]
+
+[[package]]
+name = "tarkov_market_observer"
+version = "0.1.0"
+dependencies = [
+ "dotenv",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "serenity",
+ "tokio",
 ]
 
 [[package]]

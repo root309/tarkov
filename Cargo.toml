@@ -1,5 +1,5 @@
 [package]
-name = "Tarkov-MarketObserver"
+name = "tarkov_market_observer"
 version = "0.1.0"
 edition = "2021"
 
