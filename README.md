@@ -13,19 +13,18 @@ Tarkov-MarketObserverは、Escape from Tarkov (EFT) のアイテムのトレー�
 
 ## 開発環境
 
-- Rust: rustc 1.71.1
-- Cargo: cargo 1.71.1
+- rust:1.71
 
 ### セットアップ手順:
 
 1. RustとCargoをインストールします。
 2. リポジトリをクローンします:
     ```sh
-    git clone https://github.com/root309/Tarkov-MarketObserver.git
+    git clone https://github.com/root309/tarkov_market_observer.git
     ```
 3. ディレクトリに移動します:
     ```sh
-    cd Tarkov-MarketObserver
+    cd tarkov_market_observer
     ```
 4. 依存関係をインストールします:
     ```sh
@@ -33,7 +32,7 @@ Tarkov-MarketObserverは、Escape from Tarkov (EFT) のアイテムのトレー�
     ```
 5. 環境変数を設定します
 
-### 環境変数の設定
+### `.env` example
 
 1. [Discord Developer Portal](https://discord.com/developers/applications) にアクセスして、新しいアプリケーションを作成します。
 2. "Bot" タブをクリックして新しいボットを作成し、トークンをコピーします。
