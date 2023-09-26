@@ -11,11 +11,29 @@ Tarkov-MarketObserverは、Escape from Tarkov (EFT) のアイテムのトレー�
 - 様々なアイテムのトレーダーとの取引額の取得と表示機能の追加。
 - フリーマーケットのアイテム価格情報の取得と表示機能の追加。
 
-## 使い方
+## 開発環境
 
-Discordで`!btc`コマンドを使用すると、ビットコインの現在のトレーダーとの取引額を取得し表示します。
+- Rust: rustc 1.71.1
+- Cargo: cargo 1.71.1
 
-### トークンの設定
+### セットアップ手順:
+
+1. RustとCargoをインストールします。
+2. リポジトリをクローンします:
+    ```sh
+    git clone https://github.com/root309/Tarkov-MarketObserver.git
+    ```
+3. ディレクトリに移動します:
+    ```sh
+    cd Tarkov-MarketObserver
+    ```
+4. 依存関係をインストールします:
+    ```sh
+    cargo build
+    ```
+5. 環境変数を設定します
+
+### 環境変数の設定
 
 1. [Discord Developer Portal](https://discord.com/developers/applications) にアクセスして、新しいアプリケーションを作成します。
 2. "Bot" タブをクリックして新しいボットを作成し、トークンをコピーします。
@@ -24,6 +42,17 @@ Discordで`!btc`コマンドを使用すると、ビットコインの現在の�
     DISCORD_TOKEN=YOUR_DISCORD_BOT_TOKEN
     ```
 4. `YOUR_DISCORD_BOT_TOKEN`を、2.でコピーしたトークンに置き換えます。
+
+### 実行方法:
+1. プロジェクトのルートディレクトリで以下のコマンドを実行します:
+    ```sh
+    cargo run
+    ```
+
+## 使い方
+
+Discordで`!btc`コマンドを使用すると、ビットコインの現在のトレーダーとの取引額を取得し表示します。
+
 ## 開発者へ
 
 プルリクエストは大歓迎です。大きな変更については、まずissueを開き、変更したい点を議論してください。
